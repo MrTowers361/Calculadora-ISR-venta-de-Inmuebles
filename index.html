@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora ISR Venta de Inmueble | Vive 361º</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo de Vive 361º" class="logo" id="main-logo">
+            <h1>Calculadora ISR Venta de Inmueble</h1>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div class="calculator-row">
+            
+            <div class="disclaimer-card">
+                <h3>Aviso Importante</h3>
+                <p>
+                    Este es un **cálculo aproximado** y tiene fines exclusivamente informativos. El cálculo definitivo y vinculante del Impuesto Sobre la Renta (ISR) por la venta de un inmueble solo puede ser proporcionado por un **Notario Público certificado** al momento de formalizar la operación.
+                </p>
+                <p>
+                    Esta calculadora ha sido diseñada considerando los siguientes supuestos para la mayoría de las transacciones:
+                    <ul>
+                        <li>La propiedad fue adquirida a partir del año 1995.</li>
+                        <li>El cálculo aplica para propiedades donde la construcción y el terreno se adquirieron juntos.</li>
+                        <li>Si adquiriste tu propiedad en 2013 o posterior, es fundamental que cuentes con el **Comprobante Fiscal Digital por Internet (CFDI)** de la compra para que la deducción sea válida.</li>
+                    </ul>
+                </p>
+                <p>
+                    Para un cálculo preciso y adaptado a tu situación específica, te recomendamos siempre consultar a un notario.
+                </p>
+            </div>
+            <div class="form-card">
+                <div class="form-header">
+                    <h2>Datos del Inmueble</h2>
+                    <div class="form-mode">
+                        <label>
+                            <input type="radio" name="mode" value="normal" checked> Sin exención
+                        </label>
+                        <label>
+                            <input type="radio" name="mode" value="exempt"> Exenta hasta 700,000 UDIS
+                        </label>
+                    </div>
+                    <p class="small-note">
+                        *La exención aplica si es casa habitación (una vez cada 5 años).
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="saleDate">Fecha de Venta:</label>
+                    <input type="date" id="saleDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="salePrice">Precio de Venta:</label>
+                    <input type="text" id="salePrice" placeholder="Ej. 8,000,000" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="purchaseDate">Fecha de Compra:</label>
+                    <input type="date" id="purchaseDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="purchasePrice">Precio de Compra:</label>
+                    <input type="text" id="purchasePrice" placeholder="Ej. 4,000,000" required>
+                </div>
+
+                <button type="submit" id="calculate-btn">Calcular</button>
+                <div id="error-message" class="error-message"></div>
+            </div>
+            <div id="result-card" class="result-card hidden">
+                <h3>Resumen de la Venta</h3>
+                <div class="result-row">
+                    <strong>Modo de Cálculo:</strong>
+                    <span id="result-mode"></span>
+                </div>
+                <div id="result-exento" class="result-row">
+                    <strong>Valor Exento:</strong>
+                    <span id="result-exento-value"></span>
+                </div>
+                <div class="result-row">
+                    <strong>Precio Venta para ISR:</strong>
+                    <span id="result-sale-price-tax"></span>
+                </div>
+                <div class="result-row">
+                    <strong>Costo de Adquisición Actualizado:</strong>
+                    <span id="result-updated-purchase"></span>
+                </div>
+                <div class="result-row">
+                    <strong>Utilidad Fiscal:</strong>
+                    <span id="result-utilidad"></span>
+                </div>
+                <div class="result-row final-result">
+                    <strong>ISR a Pagar:</strong>
+                    <span id="result-tax"></span>
+                </div>
+            </div>
+            </div> <div class="contact-card">
+            <h3>¿Necesitas asesoría precisa para la venta de tu propiedad?</h3>
+            <p>
+                Recuerda, esta es una estimación. Para un cálculo definitivo y la mejor estrategia fiscal en la venta de tu casa, contáctanos.
+            </p>
+            <p class="contact-info">
+                📞 Llámanos o envíanos un WhatsApp:
+                <a href="tel:+525554505361" class="phone-link">55-5450-5361</a>
+                <a href="https://wa.me/525554505361" target="_blank" class="whatsapp-btn">
+                    Enviar WhatsApp
+                </a>
+            </p>
+        </div>
+        </div> <div id="loader-overlay" class="loader-overlay hidden">
+        <div class="loader"></div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

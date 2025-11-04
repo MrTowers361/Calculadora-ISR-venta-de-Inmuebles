@@ -1,0 +1,199 @@
+:root {
+    --color-primary: #002147; /* Azul marino */
+    --color-secondary: #29b6f6; /* Azul claro/Cyan */
+    --color-text-dark: #333; /* Texto oscuro para fondos claros */
+    --color-text-light: #fff; /* Texto claro para fondos oscuros */
+    --color-red-error: #a0100f; /* Color rojo para errores */
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: var(--color-primary);
+    color: var(--color-text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 1em;
+    box-sizing: border-box;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 2em;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5em;
+    flex-wrap: wrap; 
+}
+
+/* --- ESTILOS DEL ENCABEZADO Y LOGO --- */
+.logo {
+    max-height: 110px;
+    width: auto;
+}
+
+h1 {
+    font-size: 1.5em; 
+    color: var(--color-text-light);
+    margin: 0;
+}
+/* ------------------------------------ */
+
+
+.main-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 2em;
+    width: 100%;
+    max-width: 900px;
+}
+
+.calculator-row {
+    display: flex; /* CLAVE: Habilita Flexbox */
+    flex-direction: column; /* Por defecto: Columna (Móvil) */
+    gap: 2em;
+    width: 100%;
+}
+
+
+.form-card, .result-card {
+    background-color: var(--color-text-light);
+    color: var(--color-text-dark);
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    flex: 1; /* Valor por defecto para móvil */
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* --- DISCLAIMER CARD (Estilos Móvil) --- */
+.disclaimer-card {
+    /* Eliminamos la regla width: 100% y dejamos que el flex-direction: column la haga full width */
+    max-width: 250px; 
+    background-color: #f0f8ff; 
+    color: var(--color-text-dark);
+    padding: 1.0em;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 2em; 
+    border-left: 5px solid var(--color-secondary); 
+}
+.disclaimer-card h3 { color: var(--color-primary); margin-top: 0; margin-bottom: 0.5em; }
+.disclaimer-card p { font-size: 0.6em; line-height: 1.5; margin-bottom: 1em; }
+.disclaimer-card ul { font-size: 0.9em; line-height: 1.5; padding-left: 1.5em; margin-top: 0; }
+/* ------------------------------------ */
+
+
+/* --- MEDIA QUERY (Escritorio) --- */
+@media (min-width: 768px) {
+    
+    .calculator-row {
+        flex-direction: row; /* CLAVE: Lo convierte en fila */
+        min-height: 550px;
+        align-items: flex-start; /* CLAVE: Alinea a la parte superior */
+    }
+    
+    /* PROPORCIONES DE ESPACIO PARA LAS 3 TARJETAS */
+    .disclaimer-card {
+        flex: 1.2; 
+        margin-top: 0; 
+        max-width: none; /* CLAVE: Anula el max-width de móvil */
+    }
+    .form-card {
+        flex: 2; /* El formulario es el más ancho */
+    }
+    .result-card {
+        flex: 1.5; 
+    }
+    
+    h1 {
+        font-size: 2em; 
+    }
+    .logo {
+        max-height: 110px; 
+    }
+}
+/* --- FIN DE MEDIA QUERY --- */
+
+/* --- ESTILOS GENÉRICOS DE FORMULARIO Y RESULTADOS (Sin cambios) --- */
+
+.form-header { margin-bottom: 1.0em; }
+.form-header h2 { color: var(--color-primary); margin: 0 0 0.5em; }
+.form-mode { display: flex; gap: 1em; }
+.form-mode label { cursor: pointer; }
+.form-group { margin-bottom: 1.5em; position: relative; }
+label { display: block; margin-bottom: .5em; color: var(--color-primary); }
+input[type="text"], input[type="date"] {
+    width: 100%; padding: 0.75em; box-sizing: border-box; border: 1px solid #ccc;
+    background-color: #f9f9f9; color: var(--color-text-dark); border-radius: 4px;
+    transition: border-color 0.3s;
+}
+input[type="text"]:focus, input[type="date"]:focus { outline: none; border-color: var(--color-secondary); }
+input.error { border: 2px solid var(--color-red-error); }
+.error-message {
+    color: var(--color-red-error); font-size: 0.9em; margin-top: -1em;
+    margin-bottom: 1em; text-align: center; font-weight: bold; min-height: 1.5em;
+}
+
+#calculate-btn {
+    width: 100%; padding: 1em; border: none; background-color: #ff4500; 
+    color: var(--color-text-light); font-size: 1.1em; font-weight: bold; 
+    border-radius: 25px; cursor: pointer; transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+    margin-top: auto; box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 69, 0, 0.5); 
+}
+#calculate-btn:hover { background-color: #ff6347; box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 69, 0, 0.7); }
+#calculate-btn:active { transform: translateY(2px); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); }
+
+.result-card h3 { color: var(--color-primary); margin-top: 0; }
+.result-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 0.4em 0; border-bottom: 1px dashed #ccc;
+}
+.result-row:last-child { border-bottom: none; }
+.result-row strong { color: var(--color-primary); }
+.result-value { font-size: 1.1em; font-weight: bold; color: var(--color-text-dark); }
+.final-result { margin-top: auto; padding-top: 1em; }
+.final-result .result-value { font-size: 1.5em; color: var(--color-secondary); }
+.hidden { display: none !important; }
+
+.loader-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 33, 71, 0.7); display: flex;
+    justify-content: center; align-items: center; z-index: 1000;
+}
+.loader {
+    border: 5px solid #f3f3f3; border-top: 5px solid var(--color-secondary);
+    border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* --- ESTILOS DE CONTACTO --- */
+.small-note { font-size: 0.85em; color: #777; margin-top: 10px; margin-bottom: 0; }
+.contact-card {
+    background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px;
+    padding: 20px; text-align: center; width: 100%; box-sizing: border-box; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
+}
+.contact-card h3 { color: var(--color-primary); margin-top: 0; margin-bottom: 10px; font-size: 1.3em; }
+.contact-card p { color: var(--color-text-dark); margin-bottom: 15px; font-size: 1em; }
+.contact-info { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.phone-link { color: #007bff; text-decoration: none; font-weight: bold; font-size: 1.2em; }
+.whatsapp-btn {
+    display: inline-block; background-color: #25D366; color: white; padding: 12px 24px;
+    border-radius: 25px; text-decoration: none; font-weight: 600; font-size: 1.1em;
+    transition: background-color 0.3s, transform 0.2s; border: none;
+}
+.whatsapp-btn:hover { background-color: #128C7E; transform: scale(1.05); }
