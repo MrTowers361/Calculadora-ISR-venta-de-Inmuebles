@@ -1,5 +1,5 @@
 // Valor fijo de la UDI (ajústalo cuando cambie)
-const UDI_VALUE = 8.586547;
+const UDI_VALUE = 8.598735;
 
 // --- Funciones auxiliares ---
 function parseDate(dateStr) {
@@ -223,3 +223,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
