@@ -1,51 +1,7 @@
-// Valor fijo de la UDI (ajústalo cuando cambie)
+// Valor fijo de la UDI (ajustable)
 const UDI_VALUE = 8.816055;
 
-// --- Funciones auxiliares ---
-function parseDate(dateStr) {
-    if (dateStr.includes("-")) return new Date(dateStr);
-    const [dd, mm, yyyy] = dateStr.split("/");
-    return new Date(+yyyy, +mm - 1, +dd);
-}
-
-function formatCurrency(val) {
-    return new Intl.NumberFormat("es-MX", {
-        style: "currency", currency: "MXN"
-    }).format(val);
-}
-
-function getCompleteYears(saleDate, purchaseDate) {
-    const s = parseDate(saleDate), p = parseDate(purchaseDate);
-    let yrs = s.getFullYear() - p.getFullYear();
-    if (s.getMonth() < p.getMonth() || (s.getMonth() === p.getMonth() && s.getDate() < p.getDate())) {
-        yrs--;
-    }
-    return yrs > 0 ? yrs : 1;
-}
-
-function getINPC(dateStr, isPurchase = false) {
-    const d = parseDate(dateStr);
-    let y = d.getFullYear(), mIdx = d.getMonth() + 1;
-    if (isPurchase) {
-        if (--mIdx === 0) { y--; mIdx = 12; }
-    }
-    const m = String(mIdx).padStart(2, "0");
-    const years = Object.keys(dataReference.inpc).map(Number);
-    const maxY = Math.max(...years);
-
-    if (y > maxY) {
-        y = maxY;
-        mIdx = Math.max(...Object.keys(dataReference.inpc[y]).map(Number));
-        return dataReference.inpc[y][String(mIdx).padStart(2, "0")];
-    }
-    const yearTbl = dataReference.inpc[y];
-    if (!yearTbl[m]) {
-        const lastM = Math.max(...Object.keys(yearTbl).map(Number));
-        return yearTbl[String(lastM).padStart(2, "0")];
-    }
-    return yearTbl[m];
-}
-
+// Tablas de referencia e INPC
 const dataReference = {
     inpc: {
         "2026":{"01":143.588,"02":144.307,"03":145.544,"04":145.831,"05":145.527,"06":145.131,"07":145.169},
@@ -84,41 +40,122 @@ const dataReference = {
     taxTable: [
         { lowerLimit: 0.01, upperLimit: 8952.49, fixed: 0, percent: 1.92 },
         { lowerLimit: 8952.5, upperLimit: 75984.55, fixed: 171.88, percent: 6.4 },
-        { lowerLimit: 75984.56,upperLimit: 133536.07,fixed: 4461.94, percent:10.88},
-        { lowerLimit:133536.08,upperLimit:155229.80, fixed:10723.55, percent:16 },
-        { lowerLimit:155229.81,upperLimit:185852.57, fixed:14194.54, percent:17.92},
-        { lowerLimit:185852.58,upperLimit:374837.88, fixed:19682.13, percent:21.36},
-        { lowerLimit:374837.89,upperLimit:590795.99, fixed:60049.40, percent:23.52},
-        { lowerLimit:590796.00,upperLimit:1127926.84,fixed:110842.74, percent:30 },
-        { lowerLimit:1127926.85,upperLimit:1503902.46,fixed:271981.99,percent:32 },
-        { lowerLimit:1503902.47,upperLimit:4511707.37,fixed:392294.17, percent:34 },
-        { lowerLimit:4511707.38,upperLimit:Infinity, fixed:1414947.85,percent:35 }
+        { lowerLimit: 75984.56, upperLimit: 133536.07, fixed: 4461.94, percent: 10.88 },
+        { lowerLimit: 133536.08, upperLimit: 155229.80, fixed: 10723.55, percent: 16 },
+        { lowerLimit: 155229.81, upperLimit: 185852.57, fixed: 14194.54, percent: 17.92 },
+        { lowerLimit: 185852.58, upperLimit: 374837.88, fixed: 19682.13, percent: 21.36 },
+        { lowerLimit: 374837.89, upperLimit: 590795.99, fixed: 60049.40, percent: 23.52 },
+        { lowerLimit: 590796.00, upperLimit: 1127926.84, fixed: 110842.74, percent: 30 },
+        { lowerLimit: 1127926.85, upperLimit: 1503902.46, fixed: 271981.99, percent: 32 },
+        { lowerLimit: 1503902.47, upperLimit: 4511707.37, fixed: 392294.17, percent: 34 },
+        { lowerLimit: 4511707.38, upperLimit: Infinity, fixed: 1414947.85, percent: 35 }
     ]
 };
 
+// Auxiliares
+function parseDate(dateStr) {
+    if (!dateStr) return new Date();
+    if (dateStr.includes("-")) {
+        const parts = dateStr.split("-");
+        return new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    }
+    const parts = dateStr.split("/");
+    return new Date(+parts[2], +parts[1] - 1, +parts[0]);
+}
+
+function parseFormattedNumber(valStr) {
+    if (!valStr) return 0;
+    // Remueve cualquier caracter que no sea dígito o punto decimal
+    const cleaned = valStr.toString().replace(/[^\d.]/g, "");
+    return parseFloat(cleaned) || 0;
+}
+
+function formatCurrency(val) {
+    return new Intl.NumberFormat("es-MX", {
+        style: "currency", currency: "MXN"
+    }).format(val || 0);
+}
+
+function getCompleteYears(saleDate, purchaseDate) {
+    const s = parseDate(saleDate);
+    const p = parseDate(purchaseDate);
+    const diffTime = s.getTime() - p.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
+    const yrs = Math.floor(diffDays / 365);
+    return yrs > 0 ? yrs : 1;
+}
+
+function getINPC(dateStr) {
+    const d = parseDate(dateStr);
+    let y = d.getFullYear(), mIdx = d.getMonth() + 1;
+    const m = String(mIdx).padStart(2, "0");
+    
+    const years = Object.keys(dataReference.inpc).map(Number);
+    const minY = Math.min(...years);
+    const maxY = Math.max(...years);
+
+    if (y < minY) y = minY;
+    if (y > maxY) y = maxY;
+
+    const yearTbl = dataReference.inpc[y];
+    if (!yearTbl) return 1;
+    if (!yearTbl[m]) {
+        const lastM = Math.max(...Object.keys(yearTbl).map(Number));
+        return yearTbl[String(lastM).padStart(2, "0")];
+    }
+    return yearTbl[m];
+}
+
 function calculateISR(salePrice, purchasePrice, saleDate, purchaseDate, isExempt) {
     const years = getCompleteYears(saleDate, purchaseDate);
-    const factor = getINPC(saleDate, false) / getINPC(purchaseDate, true);
-    
+    const inpcVenta = getINPC(saleDate);
+    const inpcCompra = getINPC(purchaseDate);
+    const factor = inpcVenta / inpcCompra;
+
     let salePriceTax = salePrice;
     let updatedPurchase = 0;
     let exentoPesos = 0;
+    let utilidad = 0;
+
+    // Depreciación máxima del 80% (3% por año)
+    const depPct = Math.min(years * 0.03, 0.80);
 
     if (isExempt) {
         exentoPesos = 700000 * UDI_VALUE;
         const diffSale = Math.max(0, salePrice - exentoPesos);
-        const pct = diffSale / salePrice;
+        const pctGravable = salePrice > 0 ? (diffSale / salePrice) : 0;
+        
         salePriceTax = diffSale;
-        updatedPurchase = factor * (0.2 * purchasePrice * pct + 0.8 * purchasePrice * pct * (1 - 0.03 * years));
+
+        const terrenoOriginalAjustado = (purchasePrice * pctGravable) * 0.2;
+        const terrenoActualizado = terrenoOriginalAjustado * factor;
+
+        const construccionOriginalAjustada = (purchasePrice * pctGravable) * 0.8;
+        const construccionDepreciada = construccionOriginalAjustada - (depPct * construccionOriginalAjustada);
+        const construccionActualizada = construccionDepreciada * factor;
+
+        updatedPurchase = terrenoActualizado + construccionActualizada;
+        utilidad = Math.max(0, salePriceTax - updatedPurchase);
     } else {
-        updatedPurchase = 0.2 * purchasePrice * factor + 0.8 * purchasePrice * factor * (1 - 0.03 * years);
+        const terrenoOriginal = purchasePrice * 0.2;
+        const terrenoActualizado = terrenoOriginal * factor;
+
+        const construccionOriginal = purchasePrice * 0.8;
+        const construccionDepreciada = construccionOriginal - (depPct * construccionOriginal);
+        const construccionActualizada = construccionDepreciada * factor;
+
+        updatedPurchase = terrenoActualizado + construccionActualizada;
+        utilidad = Math.max(0, salePrice - updatedPurchase);
     }
-    
-    const utilidad = salePriceTax - updatedPurchase;
+
     const annUtil = utilidad / years;
     const bracket = dataReference.taxTable.find(b => annUtil >= b.lowerLimit && annUtil <= b.upperLimit) || dataReference.taxTable[dataReference.taxTable.length - 1];
-    const annualTax = bracket.fixed + ((annUtil - bracket.lowerLimit) * (bracket.percent / 100));
-    const tax = annualTax * years;
+    
+    const excedente = Math.max(0, annUtil - bracket.lowerLimit);
+    const excedentePct = excedente * (bracket.percent / 100);
+    const annualTax = excedentePct + bracket.fixed;
+    
+    const tax = utilidad > 0 ? annualTax * years : 0;
 
     return {
         utilidad: utilidad,
@@ -134,13 +171,11 @@ function displayResults(results, mode) {
     document.getElementById("result-sale-price-tax").textContent = formatCurrency(results.salePriceTax);
     document.getElementById("result-updated-purchase").textContent = formatCurrency(results.updatedPurchase);
     document.getElementById("result-utilidad").textContent = formatCurrency(results.utilidad);
-    document.getElementById("result-tax").textContent = formatCurrency(results.tax);
-let taxDisplay;
+    
+    let taxDisplay;
     if (results.tax <= 0) {
-        // Si el impuesto es cero o negativo, mostramos "Exento"
-        taxDisplay = "Exento";
+        taxDisplay = "Exento / Sin impuesto";
     } else {
-        // Si hay impuesto a pagar, lo formateamos como moneda
         taxDisplay = formatCurrency(results.tax);
     }
     document.getElementById("result-tax").textContent = taxDisplay;
@@ -163,68 +198,66 @@ document.addEventListener("DOMContentLoaded", () => {
     const loaderOverlay = document.getElementById("loader-overlay");
     const numberInputs = ['salePrice', 'purchasePrice'];
 
+    // Formateo automático al escribir
     numberInputs.forEach(id => {
         const input = document.getElementById(id);
-        input.addEventListener('input', () => {
-            let value = input.value.replace(/[^\d]/g, '');
-            if (value) {
-                input.value = parseInt(value).toLocaleString('es-MX');
-            } else {
-                input.value = '';
-            }
-        });
+        if (input) {
+            input.addEventListener('input', () => {
+                let rawVal = input.value.replace(/[^\d]/g, '');
+                if (rawVal) {
+                    input.value = parseInt(rawVal, 10).toLocaleString('es-MX');
+                } else {
+                    input.value = '';
+                }
+            });
+        }
     });
 
-    calculateBtn.addEventListener("click", function(e) {
-        e.preventDefault();
-        
-        const saleDateInput = document.getElementById("saleDate");
-        const purchaseDateInput = document.getElementById("purchaseDate");
-        const salePriceInput = document.getElementById("salePrice");
-        const purchasePriceInput = document.getElementById("purchasePrice");
+    if (calculateBtn) {
+        calculateBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            
+            const saleDateInput = document.getElementById("saleDate");
+            const purchaseDateInput = document.getElementById("purchaseDate");
+            const salePriceInput = document.getElementById("salePrice");
+            const purchasePriceInput = document.getElementById("purchasePrice");
 
-        const saleDate = saleDateInput.value;
-        const purchaseDate = purchaseDateInput.value;
-        const salePrice = parseFloat(salePriceInput.value.replace(/,/g, ""));
-        const purchasePrice = parseFloat(purchasePriceInput.value.replace(/,/g, ""));
+            const saleDate = saleDateInput.value;
+            const purchaseDate = purchaseDateInput.value;
+            const salePrice = parseFormattedNumber(salePriceInput.value);
+            const purchasePrice = parseFormattedNumber(purchasePriceInput.value);
 
-        let hasError = false;
-        if (!saleDate) { saleDateInput.classList.add('error'); hasError = true; } else { saleDateInput.classList.remove('error'); }
-        if (isNaN(salePrice)) { salePriceInput.classList.add('error'); hasError = true; } else { salePriceInput.classList.remove('error'); }
-        if (!purchaseDate) { purchaseDateInput.classList.add('error'); hasError = true; } else { purchaseDateInput.classList.remove('error'); }
-        if (isNaN(purchasePrice)) { purchasePriceInput.classList.add('error'); hasError = true; } else { purchasePriceInput.classList.remove('error'); }
+            let hasError = false;
+            if (!saleDate) { saleDateInput.classList.add('error'); hasError = true; } else { saleDateInput.classList.remove('error'); }
+            if (salePrice <= 0) { salePriceInput.classList.add('error'); hasError = true; } else { salePriceInput.classList.remove('error'); }
+            if (!purchaseDate) { purchaseDateInput.classList.add('error'); hasError = true; } else { purchaseDateInput.classList.remove('error'); }
+            if (purchasePrice <= 0) { purchasePriceInput.classList.add('error'); hasError = true; } else { purchasePriceInput.classList.remove('error'); }
 
-        if (hasError) {
-            errorMessage.textContent = "Por favor, completa todos los campos para continuar.";
-            resultCard.classList.add('hidden');
-            return;
-        }
+            if (hasError) {
+                errorMessage.textContent = "Por favor, completa todos los campos con valores válidos.";
+                resultCard.classList.add('hidden');
+                return;
+            }
 
-        errorMessage.textContent = "";
-        
-        // Muestra el overlay
-        if (loaderOverlay) {
-            loaderOverlay.classList.remove('hidden');
-        } else {
-            console.error('Loader overlay not found');
-        }
-
-        resultCard.classList.add('hidden');
-
-        setTimeout(() => {
-            const mode = document.querySelector('input[name="mode"]:checked').value;
-            const results = calculateISR(salePrice, purchasePrice, saleDate, purchaseDate, mode === 'exempt');
-            displayResults(results, mode);
-
-            // Oculta el overlay
+            errorMessage.textContent = "";
+            
             if (loaderOverlay) {
-                loaderOverlay.classList.add('hidden');
+                loaderOverlay.classList.remove('hidden');
             }
-        }, 1500);
-    });
 
+            resultCard.classList.add('hidden');
+
+            setTimeout(() => {
+                const selectedModeRadio = document.querySelector('input[name="mode"]:checked');
+                const mode = selectedModeRadio ? selectedModeRadio.value : 'normal';
+                
+                const results = calculateISR(salePrice, purchasePrice, saleDate, purchaseDate, mode === 'exempt');
+                displayResults(results, mode);
+
+                if (loaderOverlay) {
+                    loaderOverlay.classList.add('hidden');
+                }
+            }, 300);
+        });
+    }
 });
-
-
-
-
