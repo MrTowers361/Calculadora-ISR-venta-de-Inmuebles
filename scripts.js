@@ -1,5 +1,5 @@
 // Valor fijo de la UDI (ajustable)
-const UDI_VALUE = 8.824423;
+const UDI_VALUE = 8.932476;
 
 // Tablas de referencia e INPC
 const dataReference = {
